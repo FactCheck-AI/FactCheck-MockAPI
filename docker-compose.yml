@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${WEBPROXY_PORT:-8094}:8000"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mockapi}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mockapi}
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  db:
+    image: docker.io/bitnami/postgresql:17
+    volumes:
+      - 'postgresql_master_data:/bitnami/postgresql'
+      - './db/full_restore.sql:/tmp/full_restore.sql'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mockapi}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mockapi}
+    expose:
+      - ${POSTGRESQL_PORT:-5432}
+    networks:
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  postgresql_master_data:
+    driver: local

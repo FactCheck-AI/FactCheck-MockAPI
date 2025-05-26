@@ -91,3 +91,6 @@ db.sqlite3
 .idea/*
 .vscode/*
 .venv/
+
+local_backup.sh
+db_backup.sql

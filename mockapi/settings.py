@@ -11,6 +11,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+
+# Initialize environment variables
+env = environ.Env(
+    POSTGRES_DB=(str, 'mockapi'),
+    POSTGRES_USER=(str, 'postgres'),
+    POSTGRES_PASSWORD=(str, 'mockapi'),
+    POSTGRES_HOST=(str, 'db'),
+)
+
+# Read .env file if it exists
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,11 +95,11 @@ WSGI_APPLICATION = 'mockapi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mockapi',
-        'USER': 'postgres',
-        'PASSWORD': 'sbadmin912',  # Change this to your actual password
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': env('POSTGRES_DB', default='mockapi'),
+        'USER': env('POSTGRES_USER', default='postgres'),
+        'PASSWORD': env('POSTGRES_PASSWORD', default='mockapi'),
+        'HOST': env('POSTGRES_HOST', default='db'),
+        'PORT': env('POSTGRES_PORT', default='5432'),
     }
 }
 
