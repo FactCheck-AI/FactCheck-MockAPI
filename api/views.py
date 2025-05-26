@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from django.conf import settings
-from .models import APIKey, Dataset, Fact, SerpContent, Link
+from .models import APIKey, Dataset, Fact, SerpContent, Link, Question, HtmlContent
 from .utils import validate_api_key, load_mock_data
 
 
@@ -223,4 +223,125 @@ def api_serp_content_query(request):
         return JsonResponse({
             'error': f'Internal server error: {str(e)}',
             'url': url
+        }, status=500)
+
+@csrf_exempt
+def api_fact_questions(request, dataset_name, fact_id):
+    """Get all fetchable questions for a specific fact, sorted by score with fetch_id"""
+    api_key = validate_api_key(request)
+    if not api_key:
+        return JsonResponse({'error': 'Invalid API key'}, status=401)
+
+    # Get dataset and fact
+    dataset = get_object_or_404(Dataset, name=dataset_name, is_active=True)
+    fact = get_object_or_404(Fact, dataset=dataset, fact_id=fact_id)
+
+    # Get all fetchable questions ordered by score (highest first)
+    questions = Question.objects.filter(
+        fact=fact,
+    ).order_by('-score')
+
+    # Build response with synthetic fetch_id
+    questions_data = []
+    for index, question in enumerate(questions):
+        questions_data.append({
+            'fetch_id': index,  # Synthetic ID based on ranking
+            'text': question.text,
+            'score': question.score,
+            'is_fetchable': question.is_fetchable
+        })
+
+    # Update API key usage
+    api_key.usage_count += 1
+    api_key.last_used = timezone.now()
+    api_key.save()
+
+    return JsonResponse({
+        'success': True,
+        'dataset': dataset_name,
+        'fact_id': fact_id,
+        'questions': questions_data,
+        'count': len(questions_data)
+    })
+
+@csrf_exempt
+def api_fact_question_page(request, dataset_name, fact_id, question_rank):
+    """Get HTML content and available URLs for a specific question by rank"""
+    api_key = validate_api_key(request)
+    if not api_key:
+        return JsonResponse({'error': 'Invalid API key'}, status=401)
+
+    try:
+        # Get dataset and fact
+        dataset = get_object_or_404(Dataset, name=dataset_name, is_active=True)
+        fact = get_object_or_404(Fact, dataset=dataset, fact_id=fact_id)
+
+        # Get all fetchable questions ordered by score (highest first)
+        questions = Question.objects.filter(
+            fact=fact,
+            is_fetchable=True
+        ).order_by('-score')
+
+        # Check if question_rank is valid
+        if question_rank >= len(questions) or question_rank < 0:
+            return JsonResponse({
+                'error': f'Question rank {question_rank} not found. Available ranks: 0-{len(questions)-1}'
+            }, status=404)
+
+        # Get the question at the specified rank
+        question = questions[question_rank]
+
+        # Get HTML content for this question
+        try:
+            html_content = question.html_content
+        except HtmlContent.DoesNotExist:
+            return JsonResponse({
+                'error': f'No HTML content available for question at rank {question_rank}'
+            }, status=404)
+
+        # Get all available URLs for this HTML content
+        available_urls = []
+        html_content_urls = html_content.htmlcontenturl_set.select_related('link').filter(
+            link__is_active=True
+        ).order_by('rank')
+
+        for html_url in html_content_urls:
+            link = html_url.link
+            url_data = {
+                'url': link.url,
+                'domain': link.domain,
+                'title': link.title,
+                'description': link.description,
+                'rank': html_url.rank,
+                'scrape_count': link.scrape_count,
+                'last_scraped': link.last_scraped.isoformat() if link.last_scraped else None,
+                'has_serp_content': hasattr(link, 'serp_content')
+            }
+            available_urls.append(url_data)
+
+        # Update API key usage
+        api_key.usage_count += 1
+        api_key.last_used = timezone.now()
+        api_key.save()
+
+        return JsonResponse({
+            'success': True,
+            'dataset': dataset_name,
+            'fact_id': fact_id,
+            'question_rank': question_rank,
+            'question': {
+                'text': question.text,
+                'score': question.score,
+                'is_fetchable': question.is_fetchable
+            },
+            'html_content': {
+                'content': html_content.content
+            },
+            'available_urls': available_urls,
+            'total_urls': len(available_urls)
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Internal server error: {str(e)}'
         }, status=500)

@@ -31,7 +31,6 @@ class Dataset(models.Model):
 class Fact(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name='facts')
     fact_id = models.CharField(max_length=50)
-    questions_data = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -43,7 +42,7 @@ class Fact(models.Model):
 
 class Question(models.Model):
     fact = models.ForeignKey(Fact, on_delete=models.CASCADE, related_name='questions')
-    text = models.CharField(max_length=512)
+    text = models.TextField()
     score = models.FloatField()
     is_fetchable = models.BooleanField(default=False)
 
@@ -136,30 +135,30 @@ class SerpContent(models.Model):
 
     # Basic content fields
     url = models.URLField(max_length=2000)
-    read_more_link = models.URLField(max_length=2000, blank=True)
+    read_more_link = models.URLField(max_length=2000, blank=True, null=True)
     language = models.CharField(max_length=10, default='en')
-    title = models.CharField(max_length=500, blank=True)
-    text = models.TextField(blank=True)
-    summary = models.TextField(blank=True)
+    title = models.CharField(max_length=500, blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
+    summary = models.TextField(blank=True, null=True)
 
     # Image fields
-    top_image = models.URLField(max_length=1000, blank=True)
-    meta_img = models.URLField(max_length=1000, blank=True)
-    images = models.JSONField(default=list, blank=True)  # Array of image URLs
+    top_image = models.URLField(max_length=1000, blank=True, null=True)
+    meta_img = models.URLField(max_length=1000, blank=True, null=True)
+    images = models.JSONField(default=list, blank=True, null=True)  # Array of image URLs
 
     # Media and content arrays
-    movies = models.JSONField(default=list, blank=True)  # Array of movie URLs
-    keywords = models.JSONField(default=list, blank=True)  # Array of keywords
+    movies = models.JSONField(default=list, blank=True, null=True)  # Array of movie URLs
+    keywords = models.JSONField(default=list, blank=True, null=True)  # Array of keywords
     tags = models.JSONField(default=list, blank=True, null=True)  # Array of tags
-    authors = models.JSONField(default=list, blank=True)  # Array of authors
+    authors = models.JSONField(default=list, blank=True, null=True)  # Array of authors
 
     # Meta fields
-    meta_keywords = models.JSONField(default=list, blank=True)
-    meta_description = models.TextField(blank=True)
-    meta_lang = models.CharField(max_length=10, blank=True)
-    meta_favicon = models.URLField(max_length=1000, blank=True)
-    meta_site_name = models.CharField(max_length=255, blank=True)
-    canonical_link = models.URLField(max_length=2000, blank=True)
+    meta_keywords = models.JSONField(default=list, blank=True, null=True)
+    meta_description = models.TextField(blank=True, null=True)
+    meta_lang = models.CharField(max_length=10, blank=True, null=True)
+    meta_favicon = models.URLField(max_length=1000, blank=True, null=True)
+    meta_site_name = models.CharField(max_length=255, blank=True, null=True)
+    canonical_link = models.URLField(max_length=2000, blank=True, null=True)
 
     # Publishing info
     publish_date = models.DateTimeField(null=True, blank=True)

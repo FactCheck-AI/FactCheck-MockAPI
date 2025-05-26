@@ -37,7 +37,7 @@
             width: 80px;
             height: 80px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
+            border-radius: 15%;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
@@ -210,11 +210,12 @@
 </head>
 <body>
 <div class="container">
-    <div class="logo">
-        <!-- Logo Icon -->
-        <img src="logo.png" alt="Logo - FactCheck">
-{#        <i class="fas fa-database"></i>#}
-    </div>
+    <img class="logo" src="/static/logo.png" alt="Logo - FactCheck" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+{##}
+{#    <div class="logo">#}
+{#        <!-- Try to load logo, fallback to icon if not found -->#}
+{#        <i class="fas fa-database logo-icon" style="display: none;"></i>#}
+{#    </div>#}
 
     <h1>MockAPI Server</h1>
     <p class="subtitle">FactCheck Benchmark</p>
@@ -273,17 +274,22 @@
 
         <div class="endpoint">
             <strong>GET</strong> /api/datasets/{dataset_name}/facts/{fact_id}/questions/
-            <br><small>Get questions.json for a specific fact</small>
+            <br><small>Get all fetchable questions for a fact, sorted by score with fetch_id</small>
         </div>
 
         <div class="endpoint">
-            <strong>GET</strong> /api/datasets/{dataset_name}/facts/{fact_id}/files/
-            <br><small>List all files for a specific fact</small>
+            <strong>GET</strong> /api/datasets/{dataset_name}/facts/{fact_id}/questions/{question_rank}/
+            <br><small>Get HTML content and available URLs for a specific question by rank</small>
         </div>
 
         <div class="endpoint">
-            <strong>GET</strong> /api/datasets/{dataset_name}/facts/{fact_id}/files/{filename}/
-            <br><small>Get specific file content (HTML, JSON, or text)</small>
+            <strong>GET</strong> /api/serp-content/?url={url}
+            <br><small>Get SERP content for a specific URL (recommended method)</small>
+        </div>
+
+        <div class="endpoint">
+            <strong>GET</strong> /api/serp-content/{encoded_url}/
+            <br><small>Get SERP content using URL path parameter</small>
         </div>
     </div>
 </div>
