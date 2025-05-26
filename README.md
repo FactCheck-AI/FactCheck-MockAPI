@@ -20,6 +20,71 @@ This API is part of the research paper **"Knowledge Graph Validation via Large L
 
 ### Installation
 
+### 🐳 Docker Deployment -- Recommended
+
+#### Using Docker Compose
+
+For production deployment or if you prefer containerized setup, you can use Docker Compose:
+
+```bash
+# Clone the repository
+git clone https://github.com/FactCheck-AI/factcheck-api.git
+cd factcheck-api
+
+# Run with custom environment variables
+POSTGRES_DB=mydb POSTGRES_USER=myuser POSTGRES_PASSWORD=mypassword docker compose up
+```
+
+**Environment Variables:**
+- `POSTGRES_DB`: Database name (default: `mockapi`)
+- `POSTGRES_USER`: Database username (default: `postgres`)
+- `POSTGRES_PASSWORD`: Database password (default: `mockapi`)
+- `WEBPROXY_PORT`: External port for the web service (default: `8094`)
+
+### Default Docker Setup
+
+For quick testing with default settings:
+
+```bash
+docker compose up
+```
+
+This will start:
+- **Backend API** on `http://localhost:8094`
+- **PostgreSQL Database** with default credentials
+- **Automatic migrations** and static file collection
+
+### Database Backup and Restore
+
+#### Restoring from Backup
+
+If you have database backup files, you can restore them using the provided script:
+
+```bash
+# Make the script executable
+chmod +x db_restore.sh
+
+# Restore database with your credentials
+./db_restore.sh mydb myuser mypassword
+```
+
+**Script Parameters:**
+- `mydb`: Target database name
+- `myuser`: Database username
+- `mypassword`: Database password
+
+**Note:** The restore script expects backup files in the `db/` directory with the naming pattern `db_backup_part_*.sql`. These files will be merged and restored into the Docker PostgreSQL container.
+
+#### How the Restore Process Works
+
+1. **Merges** multiple backup chunk files (`db_backup_part_*.sql`) into a single file
+2. **Copies** the merged backup into the Docker container
+3. **Restores** the database using `psql`
+4. **Cleans up** temporary files
+
+---
+### 🛠️ Manual Installation (not recommended)
+
 1. **Clone the repository**
 ```bash
 git clone https://github.com/FactCheck-AI/factcheck-api.git
@@ -62,6 +127,8 @@ python manage.py runserver
 ```
 
 The API will be available at `http://localhost:8000/`
+
+---
 
 ## 🔑 Authentication
 
