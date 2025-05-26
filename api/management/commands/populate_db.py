@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from api.models import (
     APIKey, Dataset, Fact, Question, Link, SerpContent,
     HtmlContent, HtmlContentUrl
@@ -40,6 +41,50 @@ def load_dataset(dataset_name: str = "FactBench", dataset_file: str = "kg.json")
 
     return kg
 
+def parse_publish_date(date_value):
+    """
+    Parse and convert publish_date to timezone-aware datetime.
+    Handles various date formats and ensures timezone awareness.
+    """
+    if not date_value:
+        return None
+
+    # If it's already a datetime object
+    if isinstance(date_value, datetime):
+        # Check if it's naive (no timezone info)
+        if timezone.is_naive(date_value):
+            # Make it timezone-aware using the default timezone
+            return timezone.make_aware(date_value)
+        return date_value
+
+    # If it's a string, try to parse it
+    if isinstance(date_value, str):
+        # Try parsing with Django's parse_datetime first
+        parsed_date = parse_datetime(date_value)
+        if parsed_date:
+            if timezone.is_naive(parsed_date):
+                return timezone.make_aware(parsed_date)
+            return parsed_date
+
+        # If that fails, try some common formats
+        date_formats = [
+            '%Y-%m-%d %H:%M:%S',
+            '%Y-%m-%d',
+            '%Y-%m-%dT%H:%M:%S',
+            '%Y-%m-%dT%H:%M:%SZ',
+            '%Y-%m-%dT%H:%M:%S.%f',
+            '%Y-%m-%dT%H:%M:%S.%fZ',
+        ]
+
+        for fmt in date_formats:
+            try:
+                parsed_date = datetime.strptime(date_value, fmt)
+                return timezone.make_aware(parsed_date)
+            except ValueError:
+                continue
+
+    # If all parsing attempts fail, return None
+    return None
 
 def load_questions(dataset_name: str, fact:str):
     """Load questions for a given dataset and fact"""
@@ -240,8 +285,11 @@ class Command(BaseCommand):
                 if dir.startswith(('yago_',)):
                     print(f'Processing directory: {dir}')
                     for _, _, files in os.walk(f'/Users/farzad/Documents/Thesis/Project/docs/{dir}/all_docs'):
-                        all_ids = []
+                        # sort files by name to ensure consistent processing order
+                        files = sorted(files, key=lambda x: x.lower())
+
                         selected_links = []
+
                         for file in files:
                             if file.endswith('.json'):
                                 try:
@@ -251,8 +299,6 @@ class Command(BaseCommand):
                                     id = data.get('id', '')
                                     rank = data.get('rank', 0)
                                     data = data.get('data', {})
-
-                                    selected_links.append((rank, data.get('url', '')))
 
                                     link, created = Link.objects.get_or_create(
                                         url=data.get('url'),
@@ -285,40 +331,11 @@ class Command(BaseCommand):
                                             'meta_favicon': data.get('meta_favicon', ''),
                                             'meta_site_name': data.get('meta_site_name', ''),
                                             'canonical_link': data.get('canonical_link', None),
-                                            'publish_date': data.get('publish_date', None),
+                                            'publish_date': parse_publish_date(data.get('publish_date')),  # Fixed line,
                                         }
                                     )
 
-                                    if id not in all_ids:
-                                        with open(f'/Users/farzad/Documents/Thesis/Project/data/google/{id}', 'r') as html_file:
-                                            content = html_file.read()
-
-                                        split_id = id.split('_')
-                                        fact_id = '_'.join(split_id[:-1])
-                                        if fact_id.startswith(('yago_', 'dbpedia_')):
-                                            fact_id = fact_id.replace('yago_', '').replace('dbpedia_', '')
-
-                                        questions = Question.objects.filter(
-                                            fact__fact_id=fact_id,
-                                            is_fetchable=True
-                                        ).order_by('-score')
-
-                                        question = questions[split_id[-1]]
-
-                                        html_content, _ = HtmlContent.objects.get_or_create(
-                                            question=question,
-                                            content=content
-                                        )
-
-                                        for rank, link in selected_links:
-                                            HtmlContentUrl.objects.get_or_create(
-                                                html_content=html_content,
-                                                link=link,
-                                                rank=rank
-                                            )
-
-                                        selected_links = []
-                                        all_ids.append(id)
+                                    selected_links.append((id, rank, link))
 
                                 except FileNotFoundError:
                                     print(f"File {file} not found in directory {dir}. Skipping.")
@@ -331,3 +348,36 @@ class Command(BaseCommand):
                                 except Exception as e:
                                     print(f"An error occurred while processing file {file} in directory {dir}: {e}")
                                     continue
+
+                        for file_id, rank, link in selected_links:
+                            with open(f'/Users/farzad/Documents/Thesis/Project/data/google/{file_id}.html', 'r') as html_file:
+                                content = html_file.read()
+
+                            split_id = file_id.split('_')
+                            dataset_name = split_id[0]
+                            fact_id = '_'.join(split_id[:-1])
+
+                            if fact_id.startswith(('yago_', 'dbpedia_')):
+                                fact_id = fact_id.replace('yago_', '').replace('dbpedia_', '')
+
+                            if fact_id.startswith(('correct_','wrong_')):
+                                dataset_name = 'factbench'
+
+                            questions = Question.objects.filter(
+                                fact__dataset__name=dataset_name,
+                                fact__fact_id=fact_id,
+                                is_fetchable=True
+                            ).order_by('-score')
+
+                            question = questions[int(split_id[-1])]
+
+                            html_content, _ = HtmlContent.objects.get_or_create(
+                                question=question,
+                                content=content
+                            )
+
+                            HtmlContentUrl.objects.get_or_create(
+                                html_content=html_content,
+                                link=link,
+                                rank=rank
+                            )
