@@ -43,8 +43,9 @@ class Fact(models.Model):
 
 class Question(models.Model):
     fact = models.ForeignKey(Fact, on_delete=models.CASCADE, related_name='questions')
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=512)
     score = models.FloatField()
+    is_fetchable = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.fact} - {self.text}"
