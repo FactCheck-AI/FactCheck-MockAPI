@@ -1,6 +1,10 @@
-# FactCheck API - Knowledge Graph Validation Benchmark
+# FactCheck API - KG LLM Benchmark 
 
-A Django-based REST API for the FactCheck benchmark, designed to evaluate Large Language Models (LLMs) capabilities in Knowledge Graph fact verification. This system provides access to three real-world KG datasets (FactBench, YAGO, and DBpedia) along with a RAG (Retrieval-Augmented Generation) dataset containing over 2 million documents.
+A Django-based REST API for the FactCheck benchmark, designed to evaluate Large Language Models (LLMs) capabilities in Knowledge Graph fact verification. This system provides access to dataset containing over 2 million documents.
+
+- 📣 NEW! It's now available as a web service at [Factcheck-Api](https://factcheck-api.dei.unipd.it/).
+
+For documentation, examples, and usage instructions, please refer to the sections below.
 
 ## 📚 Research Context
 
@@ -56,9 +60,9 @@ This will start:
 
 ### Database Backup and Restore
 
-#### Restoring from Backup
+#### Restoring database from dump file
 
-If you have database backup files, you can restore them using the provided script:
+you can restore them using the provided script through the actual dump:
 
 ```bash
 # Make the script executable
@@ -73,12 +77,12 @@ chmod +x db_restore.sh
 - `myuser`: Database username
 - `mypassword`: Database password
 
-**Note:** The restore script expects backup files in the `db/` directory with the naming pattern `db_backup_part_*.sql`. These files will be merged and restored into the Docker PostgreSQL container.
+**Note:** The restore script download backup files in the `db/` directory. These files will be integrated and restored into the Docker PostgreSQL container.
 
 #### How the Restore Process Works
 
-1. **Merges** fetch the backup file from Google Drive -- [Link](https://drive.usercontent.google.com/download?id=1FDU5Wm8mHCBxlTMD-CptyyTqdSDkjfH5&confirm=t)
-2. **Copies** the merged backup into the Docker container
+1. **Fetch** the backup file from Google Drive -- [Link](https://drive.usercontent.google.com/download?id=1FDU5Wm8mHCBxlTMD-CptyyTqdSDkjfH5&confirm=t)
+2. **Copies** the fetched backup into the Docker container
 3. **Restores** the database using `pg-restore`
 4. **Cleans up** temporary files
 
