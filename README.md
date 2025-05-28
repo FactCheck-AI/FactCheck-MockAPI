@@ -81,7 +81,7 @@ chmod +x db_restore.sh
 
 #### How the Restore Process Works
 
-1. **Fetch** the backup file from Google Drive -- [Link](https://drive.usercontent.google.com/download?id=1FDU5Wm8mHCBxlTMD-CptyyTqdSDkjfH5&confirm=t)
+1. **Fetch** the backup file from Google Drive -- [Link](https://drive.usercontent.google.com/download?id=1qKZwd1N9ie95ciM2jrxn5qMfzxDwm_Qu&confirm=t)
 2. **Copies** the fetched backup into the Docker container
 3. **Restores** the database using `pg-restore`
 4. **Cleans up** temporary files

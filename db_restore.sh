@@ -12,7 +12,7 @@ if [ -z "$3" ]; then
 fi
 
 # === CONFIGURATION ===
-FILEID="1FDU5Wm8mHCBxlTMD-CptyyTqdSDkjfH5"
+FILEID="1qKZwd1N9ie95ciM2jrxn5qMfzxDwm_Qu"
 DUMP_URL="https://drive.usercontent.google.com/download?id=${FILEID}&confirm=t"
 BACKUP_FILE_LOCAL="db/full_restore.dump"
 BACKUP_FILE_IN_CONTAINER="/tmp/full_restore.dump"
@@ -47,7 +47,7 @@ docker cp "$BACKUP_FILE_LOCAL" "$DOCKER_CONTAINER_NAME:$BACKUP_FILE_IN_CONTAINER
 # === Step 3: Restore the dump ===
 echo "🛠 Restoring database from dump..."
 docker exec -e PGPASSWORD="$DOCKER_DB_PASSWORD" "$DOCKER_CONTAINER_NAME" \
-    pg_restore -U "$DOCKER_DB_USER" -d "$DOCKER_DB_NAME" "$BACKUP_FILE_IN_CONTAINER"
+    pg_restore -x --no-owner -U "$DOCKER_DB_USER" -d "$DOCKER_DB_NAME" "$BACKUP_FILE_IN_CONTAINER"
 
 if [ $? -ne 0 ]; then
     echo "❌ Restore failed."
