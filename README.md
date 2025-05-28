@@ -50,7 +50,7 @@ docker compose up
 ```
 
 This will start:
-- **Backend API** on `http://localhost:8094`
+- **Backend API** on `http://localhost:8095`
 - **PostgreSQL Database** with default credentials
 - **Automatic migrations** and static file collection
 
@@ -77,13 +77,13 @@ chmod +x db_restore.sh
 
 #### How the Restore Process Works
 
-1. **Merges** multiple backup chunk files (`db_backup_part_*.sql`) into a single file
+1. **Merges** fetch the backup file from Google Drive -- [Link](https://drive.usercontent.google.com/download?id=1FDU5Wm8mHCBxlTMD-CptyyTqdSDkjfH5&confirm=t)
 2. **Copies** the merged backup into the Docker container
-3. **Restores** the database using `psql`
+3. **Restores** the database using `pg-restore`
 4. **Cleans up** temporary files
 
 ---
-### 🛠️ Manual Installation (not recommended)
+### 🛠️ Manual Installation -- Not recommend, use Docker instead
 
 1. **Clone the repository**
 ```bash
@@ -539,4 +539,4 @@ The authors thank Andrea Segala for contributing to the experiments on zero-shot
 
 - **Web Interface:** https://factcheck.dei.unipd.it/
 - **Datasets:** https://huggingface.co/FactCheck-AI
-- **Paper:** Available on arXiv (link coming soon)
+- **Paper:** Available on .... (link coming soon)

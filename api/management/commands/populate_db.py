@@ -281,8 +281,8 @@ class Command(BaseCommand):
         # and get all the files that start with yago_ or dbpedia_ or factbench_
         for _, dirs, _ in os.walk('/Users/farzad/Documents/Thesis/Project/docs'):
             for dir in dirs:
-                # if dir.startswith(('yago_', 'dbpedia_', 'correct', 'wrong')):
-                if dir.startswith(('yago_',)):
+                if dir.startswith(('yago_', 'dbpedia_', 'correct', 'wrong')):
+                # if dir.startswith(('yago_',)):
                     print(f'Processing directory: {dir}')
                     for _, _, files in os.walk(f'/Users/farzad/Documents/Thesis/Project/docs/{dir}/all_docs'):
                         # sort files by name to ensure consistent processing order

@@ -5,7 +5,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "${WEBPROXY_PORT:-8094}:8000"
+      - "${WEBPROXY_PORT:-8095}:8000"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-mockapi}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -19,7 +19,6 @@ services:
     image: docker.io/bitnami/postgresql:17
     volumes:
       - 'postgresql_master_data:/bitnami/postgresql'
-      - './db/full_restore.sql:/tmp/full_restore.sql'
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-mockapi}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}

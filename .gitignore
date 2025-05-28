@@ -93,4 +93,5 @@ db.sqlite3
 .venv/
 
 local_backup.sh
-db_backup.sql
+db_backup.*
+db/*
