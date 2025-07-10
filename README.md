@@ -518,18 +518,6 @@ This API supports research in:
 - **Knowledge Graph Quality:** Systematic evaluation of KG accuracy
 - **Multi-modal Consensus:** Compare predictions across multiple models
 
-### Citation
-
-If you use this API in your research, please cite:
-
-```bibtex
-@article{....,
-  title={Knowledge Graph Validation via Large Language Models},
-  author={Shami, Farzad and Marchesin, Stefano and Silvello, Gianmaria},
-  journal={....},
-  year={2025}
-}
-```
 ---
 
 ## 📄 Acknowledgements
