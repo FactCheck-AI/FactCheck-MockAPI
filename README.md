@@ -14,7 +14,21 @@ This API is part of the research paper **"Knowledge Graph Validation via Large L
 - Retrieving external evidence through Google SERP content
 - Supporting reproducible benchmarking across different models
 
-## 🚀 Quick Start
+## 🚀 Quick Usage - Online hosted service
+Create the API key through [Factcheck-Api](https://factcheck-api.dei.unipd.it/), then you can easily access the API endpoints using the provided key.
+
+You can find all the endpoint in this readme or even the web interface at [Factcheck-Api](https://factcheck-api.dei.unipd.it/).
+### Examples
+```bash
+# cURL command to fetch the results for a specific fact and question:
+curl --location 'https://factcheck-api.dei.unipd.it/api/datasets/yago/facts/25514/questions/0/' --header 'x-api-key: YOUR_API_KEY'
+```
+```bash
+# cURL command to fetch SERP content for a specific URL:
+curl --location 'https://factcheck-api.dei.unipd.it/api/serp-content/?url=https%3A%2F%2Fwww.theepochtimes.com%2Fshenyun%2Fprincess-lea-of-belgium-carried-away-by-the-rhythm-of-shen-yun-2824634&fields=text' --header 'x-api-key: YOUR_API_KEY'
+```
+
+## 🚀 Quick Start -- Setup Instructions
 
 ### Prerequisites
 
@@ -87,48 +101,84 @@ chmod +x db_restore.sh
 4. **Cleans up** temporary files
 
 ---
-### 🛠️ Manual Installation -- Not recommend, use Docker instead
 
-1. **Clone the repository**
-```bash
-git clone https://github.com/FactCheck-AI/factcheck-api.git
-cd factcheck-api
-```
+[//]: # (### 🛠️ Manual Installation -- Not recommend, use Docker instead)
 
-2. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
+[//]: # ()
+[//]: # (1. **Clone the repository**)
 
-3. **Configure database**
-```bash
-# Update mockapi/settings.py with your PostgreSQL credentials
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mockapi',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
+[//]: # (```bash)
 
-4. **Run migrations**
-```bash
-python manage.py migrate
-```
+[//]: # (git clone https://github.com/FactCheck-AI/factcheck-api.git)
 
-5. **Populate database (optional)**
-```bash
-python manage.py populate_db --clear
-```
+[//]: # (cd factcheck-api)
 
-6. **Start the server**
-```bash
-python manage.py runserver
-```
+[//]: # (```)
+
+[//]: # ()
+[//]: # (2. **Install dependencies**)
+
+[//]: # (```bash)
+
+[//]: # (pip install -r requirements.txt)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (3. **Configure database**)
+
+[//]: # (```bash)
+
+[//]: # (# Update mockapi/settings.py with your PostgreSQL credentials)
+
+[//]: # (DATABASES = {)
+
+[//]: # (    'default': {)
+
+[//]: # (        'ENGINE': 'django.db.backends.postgresql',)
+
+[//]: # (        'NAME': 'mockapi',)
+
+[//]: # (        'USER': 'your_username',)
+
+[//]: # (        'PASSWORD': 'your_password',)
+
+[//]: # (        'HOST': 'localhost',)
+
+[//]: # (        'PORT': '5432',)
+
+[//]: # (    })
+
+[//]: # (})
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (4. **Run migrations**)
+
+[//]: # (```bash)
+
+[//]: # (python manage.py migrate)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (5. **Populate database &#40;optional&#41;**)
+
+[//]: # (```bash)
+
+[//]: # (python manage.py populate_db --clear)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (6. **Start the server**)
+
+[//]: # (```bash)
+
+[//]: # (python manage.py runserver)
+
+[//]: # (```)
 
 The API will be available at `http://localhost:8000/`
 
@@ -531,4 +581,3 @@ The authors thank Andrea Segala for contributing to the experiments on zero-shot
 
 - **Web Interface:** https://factcheck.dei.unipd.it/
 - **Datasets:** https://huggingface.co/FactCheck-AI
-- **Paper:** Available on .... (link coming soon)
