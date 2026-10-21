@@ -1,3 +1,6 @@
+> **Research use only. Not a medical device.**
+> This software was developed in the HEREDITARY project as a research prototype. It has not been assessed or certified under the EU Medical Device Regulation (EU) 2017/745. It must not be used to diagnose, treat, monitor or make any other decision about individual patients.
+
 # FactCheck API - KG LLM Benchmark 
 
 A Django-based REST API for the FactCheck benchmark, designed to evaluate Large Language Models (LLMs) capabilities in Knowledge Graph fact verification. This system provides access to dataset containing over 2 million documents.
