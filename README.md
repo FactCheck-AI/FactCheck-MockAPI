@@ -575,7 +575,7 @@ This API supports research in:
 
 ## 📄 Acknowledgements
 
-This work is partially supported by the HEREDITARY Project, as part of the European Union's Horizon Europe research and innovation program under grant agreement No. GA 101137074.
+The work was supported by the HEREDITARY project, as part of the EU Horizon Europe program under Grant Agreement 101137074.
 The authors thank Andrea Segala for contributing to the experiments on zero-shot and few-shot prompting during his master's thesis.
 
 ---
